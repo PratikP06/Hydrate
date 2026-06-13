@@ -65,8 +65,24 @@ function activate(context) {
             context.globalState.update("sipCount", sipCount);
           } else if (selection == "Snooze") {
             stopInterval();
-            nextReminderAt = Date.now() + 30 * 1000;
-            setTimeout(() => startInterval(), 30 * 1000);
+
+            vscode.window
+              .showQuickPick(
+                [
+                  { label: "⏱ 15 minutes", ms: 15 * 60 * 1000 },
+                  { label: "⏱ 30 minutes", ms: 30 * 60 * 1000 },
+                  { label: "⏱ 45 minutes", ms: 45 * 60 * 1000 },
+                ],
+                { placeHolder: "Snooze for how long?" },
+              )
+              .then((choice) => {
+                if (choice) {
+                  nextReminderAt = Date.now() + choice.ms;
+                  setTimeout(() => startInterval(), choice.ms);
+                } else {
+                  startInterval();
+                }
+              });
           }
         });
 
