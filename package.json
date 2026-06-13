@@ -1,6 +1,6 @@
 {
-  "name": "hydroquest",
-  "displayName": "HydroQuest",
+  "name": "siptracker",
+  "displayName": "Sip Tracker",
   "description": "",
   "version": "0.0.1",
   "engines": {
@@ -9,26 +9,49 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": ["onStartupFinished"],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "hydroquest.helloWorld",
-      "title": "Hello World"
-    },
-    {
-      "command": "hydroquest.stop",
-      "title": "Stop Timer"
-    },
-    {
-      "command": "hydroquest.reset",
-      "title": "Reset Timer"
-    },
-    {
-      "command": "hydroquest.start",
-      "title" : "Start Timer"
+    "commands": [
+      {
+        "command": "siptracker.helloWorld",
+        "title": "Hello World"
+      },
+      {
+        "command": "siptracker.stop",
+        "title": "Stop Timer"
+      },
+      {
+        "command": "siptracker.reset",
+        "title": "Reset Timer"
+      },
+      {
+        "command": "siptracker.start",
+        "title": "Start Timer"
+      },
+      {
+        "command": "siptracker.showStats",
+        "title": "Show Stats"
+      }
+    ],
+    "configuration": {
+      "title": "siptracker",
+      "properties": {
+        "siptracker.sipInterval": {
+          "type": "number",
+          "default": 0.25,
+          "min": 0,
+          "description": "How often to remind you to drink water (in minutes)"
+        },
+        "siptracker.sipMsg" :{
+          "type" : "string",
+          "default" : "Time For a Sip!!",
+          "description": "Set your own reminder message"
+        }
+      }
     }
-  ]
   },
   "scripts": {
     "lint": "eslint .",
