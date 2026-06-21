@@ -11,10 +11,10 @@
   <!-- HEADER -->
   <div class="header">
     <div class="header-row">
-      <span class="motif motif-drop" aria-hidden="true"></span>
+      <img src="{{ICON_URI}}" class="header-logo" alt="Sip Tracker logo" />
       <h1>Sip Tracker</h1>
     </div>
-    <p class="header-sub">Daily Hydration Log</p>
+    
   </div>
 
   <!-- TOOLBAR: pause / resume / set interval -->
@@ -115,7 +115,6 @@
     function updateUI(data) {
       document.getElementById('sip-count').textContent  = data.sipCount ?? 0;
       document.getElementById('streak').textContent     = data.streak ?? 0;
-      document.getElementById('xp-percent').textContent = '';
       document.getElementById('xp-percent').innerHTML   = (data.progress ?? 0) + '<span class="stat-unit">%</span>';
       document.getElementById('xp-level').textContent   = data.level ?? 1;
       document.getElementById('xp-current').textContent = data.xp ?? 0;
@@ -123,7 +122,6 @@
       document.getElementById('hero-caption').textContent =
         `Keep sipping to reach Level ${(data.level ?? 1) + 1}`;
 
-      // fill segments proportionally
       const filled = Math.round(((data.progress ?? 0) / 100) * SEGMENT_COUNT);
       document.querySelectorAll('.segment').forEach((seg, i) => {
         seg.classList.toggle('filled', i < filled);
@@ -185,7 +183,6 @@
       vscode.postMessage({ command: 'setInterval' });
     });
 
-    // reflect whether reminders are currently running
     function updateToolbarState(isRunning) {
       document.getElementById('pause-btn').classList.toggle('is-active', isRunning);
       document.getElementById('resume-btn').classList.toggle('is-active', !isRunning);

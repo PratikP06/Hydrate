@@ -15,6 +15,11 @@ function activate(context) {
   let unlockedAchievements = new Set(
     context.globalState.get("unlockedAchievements", [])
   );
+  let earlySipCount = context.globalState.get("earlySipCount", 0);
+  let nightSipCount = context.globalState.get("nightSipCount", 0);
+  let totalSnoozes = context.globalState.get("totalSnoozes", 0);
+  let snoozedToday = context.globalState.get("snoozedToday", false);
+  let snoozeFreeStreak = context.globalState.get("snoozeFreeStreak", 0);
   const XP_PER_SIP = 10;
 
   // --- Startup date check ---
@@ -31,42 +36,62 @@ function activate(context) {
     context.globalState.update("sipDate", today);
   }
 
-  // --- Achievements list (no emoji — plain text labels) ---
+  // --- Achievements list ---
   const ACHIEVEMENTS = [
-    // sip based
-    { id: "first_drop",        label: "First Drop",        desc: "Drink your first sip", check: () => totalSips >= 1 },
-    { id: "hydration_starter", label: "Hydration Starter", desc: "10 total sips",        check: () => totalSips >= 10 },
-    { id: "century",           label: "Century",            desc: "100 total sips",       check: () => totalSips >= 100 },
-    { id: "hydration_hero",    label: "Hydration Hero",     desc: "500 total sips",       check: () => totalSips >= 500 },
-    { id: "water_legend",      label: "Water Legend",       desc: "1000 total sips",      check: () => totalSips >= 1000 },
-
-    // streak based
-    { id: "on_a_roll",         label: "On a Roll",          desc: "3 day streak",         check: () => maxStreak >= 3 },
-    { id: "week_warrior",      label: "Week Warrior",       desc: "7 day streak",         check: () => maxStreak >= 7 },
-    { id: "unstoppable",       label: "Unstoppable",        desc: "30 day streak",        check: () => maxStreak >= 30 },
-    { id: "hydration_machine", label: "Hydration Machine",  desc: "100 day streak",       check: () => maxStreak >= 100 },
-
-    // level based
-    { id: "newcomer",          label: "Newcomer",           desc: "Reach Level 5",        check: () => level >= 5 },
-    { id: "veteran",           label: "Hydration Veteran",  desc: "Reach Level 10",       check: () => level >= 10 },
-    { id: "elite",             label: "Elite Sipper",       desc: "Reach Level 25",       check: () => level >= 25 },
-    { id: "legendary",         label: "Legendary",          desc: "Reach Level 50",       check: () => level >= 50 },
+    { id: "first_drop",        label: "Oceanus",              desc: "Drink your first sip",        check: () => totalSips >= 1 },
+    { id: "hydration_starter", label: "Pontus",               desc: "10 total sips",               check: () => totalSips >= 10 },
+    { id: "century",           label: "Nereus",               desc: "100 total sips",              check: () => totalSips >= 100 },
+    { id: "hydration_hero",    label: "Tethys",               desc: "500 total sips",              check: () => totalSips >= 500 },
+    { id: "water_legend",      label: "Amphitrite",           desc: "1000 total sips",             check: () => totalSips >= 1000 },
+    { id: "on_a_roll",         label: "Tidecaller",           desc: "3 day streak",                check: () => maxStreak >= 3 },
+    { id: "week_warrior",      label: "Riverkeeper",          desc: "7 day streak",                check: () => maxStreak >= 7 },
+    { id: "unstoppable",       label: "Stormbringer",         desc: "30 day streak",               check: () => maxStreak >= 30 },
+    { id: "hydration_machine", label: "Leviathan",            desc: "100 day streak",              check: () => maxStreak >= 100 },
+    { id: "eternal_tide",      label: "Worldspring",          desc: "365 day streak",              check: () => maxStreak >= 365 },
+    { id: "newcomer",          label: "Springwater Disciple", desc: "Reach Level 5",               check: () => level >= 5 },
+    { id: "veteran",           label: "Tidewalker",           desc: "Reach Level 10",              check: () => level >= 10 },
+    { id: "elite",             label: "Abyss Wanderer",       desc: "Reach Level 25",              check: () => level >= 25 },
+    { id: "legendary",         label: "Avatar of the Deep",   desc: "Reach Level 50",              check: () => level >= 50 },
+    { id: "mythic",            label: "Worldsea Sovereign",   desc: "Reach Level 100",             check: () => level >= 100 },
+    { id: "early_bird_1",      label: "Dawnsipper",           desc: "Drink before 9am, once",      check: () => earlySipCount >= 1 },
+    { id: "early_bird_2",      label: "Sunrise Adept",        desc: "Drink before 9am, 10 times",  check: () => earlySipCount >= 10 },
+    { id: "early_bird_3",      label: "First Light Sage",     desc: "Drink before 9am, 50 times",  check: () => earlySipCount >= 50 },
+    { id: "night_owl_1",       label: "Moonwell Drinker",     desc: "Drink after 10pm, once",      check: () => nightSipCount >= 1 },
+    { id: "night_owl_2",       label: "Nocturne Keeper",      desc: "Drink after 10pm, 10 times",  check: () => nightSipCount >= 10 },
+    { id: "night_owl_3",       label: "Starlit Hydromancer",  desc: "Drink after 10pm, 50 times",  check: () => nightSipCount >= 50 },
+    { id: "no_snooze_day",     label: "Unwavering",           desc: "Complete a day without snoozing", check: () => snoozeFreeStreak >= 1 },
+    { id: "no_snooze_3",       label: "Steadfast Tide",       desc: "3 day snooze-free streak",        check: () => snoozeFreeStreak >= 3 },
+    { id: "no_snooze_7",       label: "Iron Current",         desc: "7 day snooze-free streak",        check: () => snoozeFreeStreak >= 7 },
+    { id: "snooze_5",          label: "The Procrastinator",   desc: "Snooze 5 times total",            check: () => totalSnoozes >= 5 },
+    { id: "snooze_25",         label: "Tide Resistant",       desc: "Snooze 25 times total",           check: () => totalSnoozes >= 25 },
+    { id: "sips_2000",         label: "Deluge Bearer",        desc: "2000 total sips",             check: () => totalSips >= 2000 },
+    { id: "sips_5000",         label: "Endless Current",      desc: "5000 total sips",             check: () => totalSips >= 5000 },
+    { id: "sips_10000",        label: "Wellspring Eternal",   desc: "10,000 total sips",           check: () => totalSips >= 10000 },
+    { id: "sips_25000",        label: "Source of All Rivers", desc: "25,000 total sips",           check: () => totalSips >= 25000 },
   ];
 
   function checkAchievements() {
     ACHIEVEMENTS.forEach((achievement) => {
       if (!unlockedAchievements.has(achievement.id) && achievement.check()) {
         unlockedAchievements.add(achievement.id);
-        context.globalState.update(
-          "unlockedAchievements",
-          Array.from(unlockedAchievements)
-        );
-        // showInformationMessage only renders plain text — codicons don't work here
+        context.globalState.update("unlockedAchievements", Array.from(unlockedAchievements));
         vscode.window.showInformationMessage(
           `Achievement Unlocked: ${achievement.label}. ${achievement.desc}`
         );
       }
     });
+  }
+
+  function updateTimeOfDayTracking() {
+    const hour = new Date().getHours();
+    if (hour < 9) {
+      earlySipCount++;
+      context.globalState.update("earlySipCount", earlySipCount);
+    }
+    if (hour >= 22) {
+      nightSipCount++;
+      context.globalState.update("nightSipCount", nightSipCount);
+    }
   }
 
   function xpForLevel(lvl) {
@@ -102,9 +127,7 @@ function activate(context) {
     if (xp >= xpForLevel(level)) {
       level++;
       context.globalState.update("level", level);
-      vscode.window.showInformationMessage(
-        `Level up! You're now Level ${level}!`
-      );
+      vscode.window.showInformationMessage(`Level up! You're now Level ${level}!`);
       checkAchievements();
     }
 
@@ -121,34 +144,23 @@ function activate(context) {
   function getIntervalMs() {
     const config = vscode.workspace.getConfiguration("siptracker");
     const minutes = config.get("sipInterval");
-
-    // if (!minutes || minutes < 1) {
-    //   vscode.window.showWarningMessage(
-    //     "Sip Tracker: Invalid interval! Setting to 60 minutes."
-    //   );
-    //   return 60 * 60 * 1000;
-    // }
-
+    if (!minutes || minutes < 1) {
+      vscode.window.showWarningMessage("Sip Tracker: Invalid interval! Setting to 60 minutes.");
+      return 60 * 60 * 1000;
+    }
     return minutes * 60 * 1000;
   }
 
   function getIntervalMsg() {
     const config = vscode.workspace.getConfiguration("siptracker");
     const msg = config.get("sipMsg");
-    if (!msg || msg.trim() === "") {
-      return "Time to drink water!";
-    }
+    if (!msg || msg.trim() === "") return "Time to drink water!";
     return msg;
   }
 
   // --- Status Bar ---
-  // Shows ONLY the countdown to the next reminder. Nothing else lives here —
-  // level, streak, and achievements moved entirely into the Webview panel.
-  const statusBar = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Left,
-    100
-  );
-  statusBar.text = "$(flame) --:--";
+  const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, 100);
+  statusBar.text = "$(clockface) --:--";
   statusBar.tooltip = "Sip Tracker — click to open dashboard";
   statusBar.command = "siptracker.showStats";
   statusBar.show();
@@ -158,17 +170,14 @@ function activate(context) {
       const remaining = nextReminderAt - Date.now();
       const minutes = Math.floor(remaining / 60000);
       const seconds = Math.floor((remaining % 60000) / 1000);
-      statusBar.text = `$(flame) ${minutes}:${seconds.toString().padStart(2, "0")}`;
+      statusBar.text = `$(clockface) ${minutes}:${seconds.toString().padStart(2, "0")}`;
     } else {
-      statusBar.text = "$(flame) --:--";
+      statusBar.text = "$(clockface) --:--";
     }
   }
 
-  const countdownTick = setInterval(() => {
-    updateStatusBar();
-  }, 1000);
+  const countdownTick = setInterval(() => { updateStatusBar(); }, 1000);
 
-  // --- Config change listener ---
   vscode.workspace.onDidChangeConfiguration((e) => {
     if (
       e.affectsConfiguration("siptracker.sipInterval") ||
@@ -191,23 +200,33 @@ function activate(context) {
         .showInformationMessage(getIntervalMsg(), "Done", "Snooze")
         .then((selection) => {
           if (selection == "Done") {
+            const isFirstSipToday = sipCount === 0;
+
             sipCount++;
             totalSips++;
             context.globalState.update("sipCount", sipCount);
             context.globalState.update("totalSips", totalSips);
             context.globalState.update("sipDate", new Date().toDateString());
 
+            updateTimeOfDayTracking();
             updateStreak();
             checkAchievements();
+            addXP();
 
-            const progress = addXP();
-            vscode.window.showInformationMessage(
-              `${XP_PER_SIP} XP earned. ${progress}% to Level ${level + 1}. ${streak} day streak.`
-            );
+            vscode.window.showInformationMessage(`${XP_PER_SIP} XP gained`);
+            if (isFirstSipToday) {
+              vscode.window.showInformationMessage(`${streak} day streak`);
+            }
 
             sendStatsToWebview();
           } else if (selection == "Snooze") {
             stopInterval();
+
+            snoozedToday = true;
+            context.globalState.update("snoozedToday", true);
+            totalSnoozes++;
+            context.globalState.update("totalSnoozes", totalSnoozes);
+            checkAchievements();
 
             vscode.window
               .showQuickPick(
@@ -225,6 +244,7 @@ function activate(context) {
                 } else {
                   startInterval();
                 }
+                sendStatsToWebview();
               });
           }
         });
@@ -250,6 +270,19 @@ function activate(context) {
         streak = 0;
         context.globalState.update("streak", 0);
       }
+
+      if (sipCount > 0) {
+        if (!snoozedToday) {
+          snoozeFreeStreak++;
+        } else {
+          snoozeFreeStreak = 0;
+        }
+        context.globalState.update("snoozeFreeStreak", snoozeFreeStreak);
+        checkAchievements();
+      }
+
+      snoozedToday = false;
+      context.globalState.update("snoozedToday", false);
       sipCount = 0;
       context.globalState.update("sipCount", 0);
       vscode.window.showInformationMessage("New day! Sip count reset.");
@@ -265,14 +298,10 @@ function activate(context) {
   //  WEBVIEW PANEL
   // ═══════════════════════════════════════════════════
 
-  let panel = null; // keep track of a single open panel
+  let panel = null;
 
-  /**
-   * Builds the stats payload and posts it to the webview.
-   * @param {boolean} showAll - whether to show all achievements
-   */
   function sendStatsToWebview(showAll = false) {
-    if (!panel) return; // panel is closed, nothing to do
+    if (!panel) return;
 
     const currentLevelXp = xpForLevel(level - 1);
     const nextLevelXp = xpForLevel(level);
@@ -289,11 +318,7 @@ function activate(context) {
         xp,
         progress,
         nextLevelXp,
-        achievements: ACHIEVEMENTS.map((a) => ({
-          id: a.id,
-          label: a.label,
-          desc: a.desc,
-        })),
+        achievements: ACHIEVEMENTS.map((a) => ({ id: a.id, label: a.label, desc: a.desc })),
         unlocked: Array.from(unlockedAchievements),
         showAll,
         isRunning: timeInterval !== null,
@@ -301,23 +326,21 @@ function activate(context) {
     });
   }
 
-  /**
-   * Reads webview.html from disk, injects the CSS webview URI,
-   * and returns the final HTML string for the panel.
-   */
   function getWebviewContent(webview) {
     const htmlPath = path.join(context.extensionPath, "webview.html");
-    const cssPath = path.join(context.extensionPath, "webview.css");
+    const cssPath  = path.join(context.extensionPath, "webview.css");
+    const iconPath = path.join(context.extensionPath, "icon.png");
 
-    const cssUri = webview.asWebviewUri(vscode.Uri.file(cssPath));
+    const cssUri  = webview.asWebviewUri(vscode.Uri.file(cssPath));
+    const iconUri = webview.asWebviewUri(vscode.Uri.file(iconPath));
 
     let html = fs.readFileSync(htmlPath, "utf8");
-    html = html.replace("{{CSS_URI}}", cssUri.toString());
+    html = html.replace("{{CSS_URI}}",  cssUri.toString());
+    html = html.replace("{{ICON_URI}}", iconUri.toString());
 
     return html;
   }
 
-  // ── showStats command — opens or focuses the webview panel ──
   const showStatsCommand = vscode.commands.registerCommand(
     "siptracker.showStats",
     function () {
@@ -340,12 +363,8 @@ function activate(context) {
       panel.webview.html = getWebviewContent(panel.webview);
 
       panel.webview.onDidReceiveMessage((msg) => {
-        if (msg.command === "ready") {
-          sendStatsToWebview();
-        }
-        if (msg.command === "showAllAchievements") {
-          sendStatsToWebview(true);
-        }
+        if (msg.command === "ready")                sendStatsToWebview();
+        if (msg.command === "showAllAchievements")  sendStatsToWebview(true);
         if (msg.command === "pauseReminders") {
           stopInterval();
           nextReminderAt = null;
@@ -358,16 +377,11 @@ function activate(context) {
           sendStatsToWebview();
         }
         if (msg.command === "setInterval") {
-          vscode.commands.executeCommand(
-            "workbench.action.openSettings",
-            "siptracker.sipInterval"
-          );
+          vscode.commands.executeCommand("workbench.action.openSettings", "siptracker.sipInterval");
         }
       });
 
-      panel.onDidDispose(() => {
-        panel = null;
-      });
+      panel.onDidDispose(() => { panel = null; });
     }
   );
 
@@ -375,36 +389,27 @@ function activate(context) {
   //  OTHER COMMANDS
   // ═══════════════════════════════════════════════════
 
-  const startCommand = vscode.commands.registerCommand(
-    "siptracker.start",
-    function () {
-      stopInterval();
-      startInterval();
-      vscode.window.showInformationMessage("Reminder Started");
-      sendStatsToWebview();
-    }
-  );
+  const startCommand = vscode.commands.registerCommand("siptracker.start", function () {
+    stopInterval();
+    startInterval();
+    vscode.window.showInformationMessage("Reminder Started");
+    sendStatsToWebview();
+  });
 
-  const stopCommand = vscode.commands.registerCommand(
-    "siptracker.stop",
-    function () {
-      stopInterval();
-      nextReminderAt = null;
-      updateStatusBar();
-      vscode.window.showInformationMessage("Reminder stopped");
-      sendStatsToWebview();
-    }
-  );
+  const stopCommand = vscode.commands.registerCommand("siptracker.stop", function () {
+    stopInterval();
+    nextReminderAt = null;
+    updateStatusBar();
+    vscode.window.showInformationMessage("Reminder stopped");
+    sendStatsToWebview();
+  });
 
-  const resetCommand = vscode.commands.registerCommand(
-    "siptracker.reset",
-    function () {
-      stopInterval();
-      startInterval();
-      vscode.window.showInformationMessage("Reminder reset");
-      sendStatsToWebview();
-    }
-  );
+  const resetCommand = vscode.commands.registerCommand("siptracker.reset", function () {
+    stopInterval();
+    startInterval();
+    vscode.window.showInformationMessage("Reminder reset");
+    sendStatsToWebview();
+  });
 
   const showAchievementsCommand = vscode.commands.registerCommand(
     "siptracker.showAchievements",

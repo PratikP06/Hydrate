@@ -1,8 +1,10 @@
 {
   "name": "siptracker",
   "displayName": "Sip Tracker",
-  "description": "",
+  "description": "Hydration reminder and tracker for Visual Studio Code",
+  "publisher": "pratik-pawar",
   "version": "0.0.1",
+  "icon": "icon.png",
   "engines": {
     "vscode": "^1.120.0"
   },
