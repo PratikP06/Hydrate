@@ -2,7 +2,7 @@
 
 Stay hydrated while you code. Hydrate reminds you to drink water on your own schedule, then turns every sip into XP, streaks, and unlockable achievements — right inside VS Code.
 
-![Hydrate dashboard](dashboard.png)
+![Hydrate dashboard](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/dashboard.png)
 
 ## Features
 
@@ -21,11 +21,11 @@ Stay hydrated while you code. Hydrate reminds you to drink water on your own sch
 3. Click **Done** when you drink, or **Snooze** to push it back
 4. Click the countdown in the status bar to open your dashboard
 
-![Reminder notification](activity.png)
+![Reminder notification](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/activity.png)
 
 Snoozing lets you pick exactly how long to wait:
 
-![Snooze picker](snooze.png)
+![Snooze picker](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/snooze.png)
 
 ## Dashboard
 
@@ -40,7 +40,7 @@ Click the status bar item (bottom of your VS Code window) to open the Hydrate da
 
 Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and search for:
 
-![Command palette](command.png)
+![Command palette](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/command.png)
 
 | Command | Description |
 |---|---|
@@ -53,6 +53,7 @@ Open the Command Palette (`Ctrl+Shift+P` / `Cmd+Shift+P`) and search for:
 ## Settings
 
 Search for **"Hydrate"** in VS Code Settings (`Ctrl+,` / `Cmd+,`):
+![Settings](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/interval.png)
 
 | Setting | Default | Description |
 |---|---|---|
@@ -62,6 +63,9 @@ Search for **"Hydrate"** in VS Code Settings (`Ctrl+,` / `Cmd+,`):
 ## How XP and levels work
 
 Every sip earns **10 XP**. The XP needed for each level increases gradually, so early levels come quickly and later ones become a longer-term goal. There's no level cap.
+
+![xp](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/xp.png)
+![level](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/level.png)
 
 ## How streaks work
 
@@ -73,9 +77,9 @@ Thirty achievements span five categories: total sips, streaks, levels, early/lat
 
 Unlocking one shows up right where you're already working:
 
-![Achievement unlocked notification](achievement-noti.png)
+![Achievement unlocked notification](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/achievement-noti.png)
 
-![Achievements list](achievement.png)
+![Achievements list](https://raw.githubusercontent.com/PratikP06/Hydrate/main/images/achievement.png)
 
 ## Privacy
 
