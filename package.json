@@ -4,7 +4,7 @@
   "description": "Stay hydrated while coding. Receive smart reminders, earn XP, build streaks, unlock achievements, and level up your hydration habits.",
   "publisher": "pratik-pawar",
   "license": "MIT",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "icon": "icon.png",
 
   "engines": {
